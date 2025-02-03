@@ -1,0 +1,60 @@
+name: Build and Deploy for using Chinese index
+on:
+    # Manual nightly & release
+    workflow_dispatch:
+
+run-name: Element Desktop
+jobs:
+    build:
+        runs-on: macos-14 # M1
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: prepare
+              id: prepare
+              run: |
+                  echo "version=$(cat package.json | jq -r .version)" >> $GITHUB_OUTPUT
+                  echo "strDate=$(TZ=UTC-8 date +%Y-%m-%d)" >> $GITHUB_OUTPUT
+            - name: Install Rust
+              if: steps.cache.outputs.cache-hit != 'true'
+              run: |
+                  rustup toolchain install stable --profile minimal --no-self-update
+                  rustup default stable
+                  rustup target add aarch64-apple-darwin
+                  rustup target add x86_64-apple-darwin
+            # M1 macos-14 comes without Python preinstalled
+            - uses: actions/setup-python@v5
+              with:
+                python-version: '3.12'
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version-file: package.json
+                  cache: "yarn"
+
+            # Does not need branch matching as only analyses this layer
+            - name: Install Deps
+              run: "yarn install --frozen-lockfile"
+
+            - name: Fetch Element Web
+              run: yarn run fetch --noverify -d "element.io/release/"
+
+            - name: Build Natives
+              run: |
+                  # Python 3.12 drops distutils which keytar relies on
+                  pip3 install setuptools
+                  yarn build:native:universal
+            - name: "[Unsigned] Build App"
+              run: |
+                  yarn build:universal --publish never
+              env:
+                  CSC_IDENTITY_AUTO_DISCOVERY: false
+
+            - name: Upload release asset
+              uses: svenstaro/upload-release-action@v2
+              with:
+                file: ./dist/*.dmg
+                tag: v${{ steps.prepare.outputs.version }}-chinese
+                file_glob: true
+                overwrite: true
+                release_name: v${{ steps.prepare.outputs.version }} ${{steps.prepare.outputs.strDate}} 编译

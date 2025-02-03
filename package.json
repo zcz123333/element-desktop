@@ -113,7 +113,7 @@
         "typescript": "5.7.3"
     },
     "hakDependencies": {
-        "matrix-seshat": "^4.0.0",
+        "matrix-seshat": "https://gitpkg.now.sh/zcz123333/seshat/seshat-node?chinese",
         "keytar": "^7.9.0"
     },
     "resolutions": {

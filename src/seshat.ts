@@ -102,10 +102,11 @@ ipcMain.on("seshat", async function (_ev: IpcMainEvent, payload): Promise<void> 
                 const passphraseKey = `seshat|${userId}|${deviceId}`;
 
                 const passphrase = await getOrCreatePassphrase(passphraseKey);
+                const language = "chinese";
 
                 try {
                     await afs.mkdir(eventStorePath, { recursive: true });
-                    eventIndex = new Seshat(eventStorePath, { passphrase });
+                    eventIndex = new Seshat(eventStorePath, { passphrase, language });
                 } catch (e) {
                     if (e instanceof ReindexError) {
                         // If this is a reindex error, the index schema
@@ -113,7 +114,7 @@ ipcMain.on("seshat", async function (_ev: IpcMainEvent, payload): Promise<void> 
                         // reindex the database and finally try to open the
                         // database again.
                         const recoveryIndex = new SeshatRecovery(eventStorePath, {
-                            passphrase,
+                            passphrase, language,
                         });
 
                         const userVersion = await recoveryIndex.getUserVersion();
