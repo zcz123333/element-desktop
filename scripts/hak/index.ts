@@ -2,7 +2,7 @@
 Copyright 2024 New Vector Ltd.
 Copyright 2020, 2021 The Matrix.org Foundation C.I.C.
 
-SPDX-License-Identifier: AGPL-3.0-only OR GPL-3.0-only
+SPDX-License-Identifier: AGPL-3.0-only OR GPL-3.0-only OR LicenseRef-Element-Commercial
 Please see LICENSE files in the repository root for full details.
 */
 
@@ -90,7 +90,8 @@ async function main(): Promise<void> {
 
         for (const s of HAKSCRIPTS) {
             if (hakJson.scripts?.[s]) {
-                const scriptModule = await import(path.join("file://", prefix, "hak", dep, hakJson.scripts[s]));
+                // Shockingly, using path.join and backslashes here doesn't work on Windows
+                const scriptModule = await import(`../../hak/${dep}/${hakJson.scripts[s]}`);
                 if (scriptModule.default) {
                     deps[dep].scripts[s] = scriptModule.default;
                 } else {
