@@ -29,7 +29,7 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version-file: package.json
+                  node-version-file: .node-version
                   cache: "yarn"
 
             # Does not need branch matching as only analyses this layer
@@ -39,10 +39,12 @@ jobs:
             - name: Fetch Element Web
               run: yarn run fetch --noverify -d "element.io/release/"
 
+            # Python 3.12 drops distutils which keytar relies on
+            - name: Install setuptools
+              run: pip3 install setuptools
+
             - name: Build Natives
               run: |
-                  # Python 3.12 drops distutils which keytar relies on
-                  pip3 install setuptools
                   yarn build:native:universal
             - name: "[Unsigned] Build App"
               run: |

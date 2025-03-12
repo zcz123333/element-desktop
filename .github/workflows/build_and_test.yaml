@@ -22,7 +22,7 @@ jobs:
         uses: ./.github/workflows/build_windows.yaml
         strategy:
             matrix:
-                arch: [x64, ia32]
+                arch: [x64, ia32, arm64]
         with:
             arch: ${{ matrix.arch }}
 
@@ -35,7 +35,6 @@ jobs:
                 sqlcipher: [system, static]
                 arch: [amd64, arm64]
         with:
-            config: ${{ github.event.pull_request.base.ref == 'develop' && 'element.io/nightly' || 'element.io/release' }}
             sqlcipher: ${{ matrix.sqlcipher }}
             arch: ${{ matrix.arch }}
 
@@ -97,7 +96,7 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version-file: package.json
+                  node-version-file: .node-version
                   cache: "yarn"
 
             - name: Install Deps
@@ -120,12 +119,6 @@ jobs:
               env:
                   # We need sudo on Linux as it is installed in /opt/
                   RUN_AS: ${{ runner.os == 'Linux' && 'sudo' || '' }}
-
-            - name: Workaround macOS GHA permission issues
-              if: runner.os == 'macOS'
-              run: |
-                  sqlite3 $HOME/Library/Application\ Support/com.apple.TCC/TCC.db "INSERT OR IGNORE INTO access VALUES ('kTCCServiceMicrophone','/usr/local/opt/runner/provisioner/provisioner',1,2,4,1,NULL,NULL,0,'UNUSED',NULL,0,1687786159,NULL,NULL,'UNUSED',1687786159);"
-                  sqlite3 $HOME/Library/Application\ Support/com.apple.TCC/TCC.db "INSERT OR IGNORE INTO access VALUES ('kTCCServiceMicrophone','/opt/off/opt/runner/provisioner/provisioner',1,2,4,1,NULL,NULL,0,'UNUSED',NULL,0,1687786159,NULL,NULL,'UNUSED',1687786159);"
 
             - name: Run tests
               uses: coactions/setup-xvfb@6b00cf1889f4e1d5a48635647013c0508128ee1a
