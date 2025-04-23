@@ -57,7 +57,7 @@ jobs:
                           "target": "i686-pc-windows-msvc",
                           "build-args": "--ia32",
                           "arch": "x86",
-                          "extra_config": "{\"user_notice\": {\"title\": \"Your desktop support ends soon\",\"description\": \"Support for 32-bit Windows installations will end soon, this impacts you. Transition to the web or mobile app for continued access.\"}}"
+                          "extra_config": "{\"user_notice\": {\"title\": \"Your desktop environment is unsupported.\",\"description\": \"Support for 32-bit Windows installations has ended. Transition to the web or mobile app for continued access.\"}}"
                         }
                       }
 
@@ -216,3 +216,13 @@ jobs:
                   Test-Path './dist/squirrel-windows*/element-desktop-*-full.nupkg'
                   Test-Path './dist/squirrel-windows*/RELEASES'
                   Test-Path './dist/Element*.msi'
+
+    test:
+        needs: build
+        uses: ./.github/workflows/build_test.yaml
+        # We have no Windows ARM64 runners at this time
+        if: inputs.arch != 'arm64'
+        with:
+            artifact: win-${{ inputs.arch }}
+            runs-on: windows-2022
+            executable: ./dist/win*-unpacked/Element*.exe
