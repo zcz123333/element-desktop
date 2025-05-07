@@ -326,6 +326,11 @@ app.commandLine.appendSwitch("--enable-usermedia-screen-capturing");
 if (!app.commandLine.hasSwitch("enable-features")) {
     app.commandLine.appendSwitch("enable-features", "WebRTCPipeWireCapturer");
 }
+// Workaround bug in electron 36:https://github.com/electron/electron/issues/46538
+// Hopefully this will no longer be needed soon and can be removed
+if (process.platform === "linux") {
+    app.commandLine.appendSwitch("gtk-version", "3");
+}
 
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -596,8 +601,9 @@ app.on("second-instance", (ev, commandLine, workingDirectory) => {
     }
 });
 
-// Set the App User Model ID to match what the squirrel
-// installer uses for the shortcut icon.
-// This makes notifications work on windows 8.1 (and is
-// a noop on other platforms).
-app.setAppUserModelId("com.squirrel.element-desktop.Element");
+// This is required to make notification handlers work
+// on Windows 8.1/10/11 (and is a noop on other platforms);
+// It must also match the ID found in 'electron-builder'
+// in order to get the title and icon to show up correctly.
+// Ref: https://stackoverflow.com/a/77314604/3525780
+app.setAppUserModelId("im.riot.app");
