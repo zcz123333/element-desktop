@@ -20,6 +20,11 @@ on:
                 required: false
                 default: false
                 description: "Whether the build should be deployed to production"
+            branch-matching:
+                type: boolean
+                required: false
+                default: false
+                description: "Whether the branch name should be matched to find the element-web commit"
         secrets:
             # Required if `nightly` is set
             CF_R2_ACCESS_KEY_ID:
@@ -49,9 +54,9 @@ jobs:
         outputs:
             nightly-version: ${{ steps.versions.outputs.nightly }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version-file: .node-version
                   cache: "yarn"
@@ -59,7 +64,25 @@ jobs:
             - name: Install Deps
               run: "yarn install --frozen-lockfile"
 
-            - name: Fetch Element Web
+            - name: Fetch Element Web (matching branch)
+              id: branch-matching
+              if: inputs.branch-matching
+              continue-on-error: true
+              run: |
+                  scripts/branch-match.sh
+                  cp "$CONFIG_DIR/config.json" element-web/
+                  yarn --cwd element-web install --frozen-lockfile
+                  yarn --cwd element-web run build
+                  mv element-web/webapp .
+                  yarn asar-webapp
+              env:
+                  # These must be set for branch-match.sh to get the right branch
+                  REPOSITORY: ${{ github.repository }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
+                  CONFIG_DIR: ${{ inputs.config }}
+
+            - name: Fetch Element Web (${{ inputs.version }})
+              if: steps.branch-matching.outcome == 'failure' || steps.branch-matching.outcome == 'skipped'
               run: yarn run fetch --noverify -d ${{ inputs.config }} ${{ inputs.version }}
 
             # We split this out to save the build_* scripts having to do it to make use of `hashFiles` in the cache action
@@ -137,7 +160,7 @@ jobs:
                   echo "| Element Web | [$WEB_VERSION](https://github.com/element-hq/element-web/commit/$WEB_VERSION) |" >> $GITHUB_STEP_SUMMARY
                   echo "| JS SDK      | [$JS_VERSION](https://github.com/matrix-org/matrix-js-sdk/commit/$JS_VERSION) |" >> $GITHUB_STEP_SUMMARY
 
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
               with:
                   name: webapp
                   retention-days: 1
