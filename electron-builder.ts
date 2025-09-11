@@ -82,13 +82,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
         },
         "lib/**",
     ],
-    extraResources: [
-        {
-            from: "res/img",
-            to: "img",
-        },
-        "webapp.asar",
-    ],
+    extraResources: ["build/icon.*", "webapp.asar"],
     extraMetadata: {
         name: pkg.name,
         productName: pkg.productName,
@@ -99,8 +93,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
     linux: {
         target: ["tar.gz", "deb"],
         category: "Network;InstantMessaging;Chat",
-        maintainer: "support@element.io",
-        icon: "build/icons",
+        icon: "build/icon.png",
         executableName: pkg.name, // element-desktop or element-desktop-nightly
     },
     deb: {
@@ -119,14 +112,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
             "libgbm1",
         ],
         recommends: ["libsqlcipher0", "element-io-archive-keyring"],
-        fpm: [
-            "--deb-field",
-            "Replaces: riot-desktop (<< 1.7.0), riot-web (<< 1.7.0)",
-            "--deb-field",
-            "Breaks: riot-desktop (<< 1.7.0), riot-web (<< 1.7.0)",
-            "--deb-pre-depends",
-            "libc6 (>= 2.31)",
-        ],
+        fpm: ["--deb-pre-depends", "libc6 (>= 2.31)"],
     },
     mac: {
         category: "public.app-category.social-networking",
@@ -136,7 +122,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
         // XXX: we cannot specify this due to https://github.com/electron/osx-sign/issues/344
         // strictVerify: true,
         entitlements: "./build/entitlements.mac.plist",
-        icon: "build/icons/icon.icns",
+        icon: "build/icon.icns",
         mergeASARs: true,
         x64ArchFiles: "**/matrix-seshat/*.node", // hak already runs lipo
     },
@@ -145,7 +131,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
         signtoolOptions: {
             signingHashAlgorithms: ["sha256"],
         },
-        icon: "build/icons/icon.ico",
+        icon: "build/icon.ico",
     },
     msi: {
         perMachine: true,
