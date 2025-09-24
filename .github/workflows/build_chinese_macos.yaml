@@ -39,6 +39,9 @@ jobs:
             - name: Fetch Element Web
               run: yarn run fetch --noverify -d "element.io/release/"
 
+            - name: Copy variant config
+              run: cp "element.io/release/build.json" variant.json
+
             # Python 3.12 drops distutils which keytar relies on
             - name: Install setuptools
               run: pip3 install setuptools
@@ -51,6 +54,7 @@ jobs:
                   yarn build:universal --publish never
               env:
                   CSC_IDENTITY_AUTO_DISCOVERY: false
+                  VARIANT_PATH: variant.json
 
             - name: Upload release asset
               uses: svenstaro/upload-release-action@v2
