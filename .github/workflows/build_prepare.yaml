@@ -85,6 +85,11 @@ jobs:
               if: steps.branch-matching.outcome == 'failure' || steps.branch-matching.outcome == 'skipped'
               run: yarn run fetch --noverify -d ${{ inputs.config }} ${{ inputs.version }}
 
+            - name: Copy variant config
+              run: cp "$CONFIG_DIR/build.json" variant.json
+              env:
+                  CONFIG_DIR: ${{ inputs.config }}
+
             # We split this out to save the build_* scripts having to do it to make use of `hashFiles` in the cache action
             - name: Generate cache hash files
               run: |
@@ -166,7 +171,7 @@ jobs:
                   retention-days: 1
                   path: |
                       webapp.asar
-                      package.json
                       electronVersion
                       hakHash
                       changelog.Debian
+                      variant.json
