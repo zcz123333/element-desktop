@@ -51,7 +51,7 @@ jobs:
                   yarn build:native:universal
             - name: "[Unsigned] Build App"
               run: |
-                  yarn build:universal --publish never
+                  yarn build:universal --publish never -m dmg
               env:
                   CSC_IDENTITY_AUTO_DISCOVERY: false
                   VARIANT_PATH: variant.json
