@@ -120,7 +120,7 @@ jobs:
                   path: |
                       ./.hak
 
-            - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+            - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
               with:
                   node-version-file: .node-version
                   cache: "yarn"
@@ -174,13 +174,6 @@ jobs:
                   if [ -f changelog.Debian ]; then
                       echo "ED_DEBIAN_CHANGELOG=changelog.Debian" >> $GITHUB_ENV
                   fi
-
-            # Workaround for https://github.com/electron-userland/electron-builder/issues/6116
-            # and https://github.com/electron-userland/electron-builder/issues/5721
-            - name: Install fpm
-              run: |
-                  sudo gem install fpm
-                  echo "USE_SYSTEM_FPM=true" >> $GITHUB_ENV
 
             - name: Build App
               run: yarn build --publish never ${{ steps.config.outputs.build-args }} -l ${{ inputs.targets }}
