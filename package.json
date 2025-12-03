@@ -116,7 +116,7 @@
         "typescript": "5.9.3"
     },
     "hakDependencies": {
-        "matrix-seshat": "https://gitpkg.now.sh/zcz123333/seshat/seshat-node?chinese"
+        "matrix-seshat": "https://gitpkg-zcz123333.vercel.app/zcz123333/seshat/seshat-node?chinese"
     },
     "resolutions": {
         "@types/node": "18.19.130",
