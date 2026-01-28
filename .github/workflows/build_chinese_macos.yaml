@@ -6,8 +6,12 @@ on:
 run-name: Element Desktop
 jobs:
     build:
-        runs-on: macos-14 # M1
+        runs-on: macos-15 # M1
         steps:
+            - uses: maxim-lobanov/setup-xcode@v1
+              with:
+                  xcode-version: latest-stable
+
             - uses: actions/checkout@v6
 
             - name: prepare
