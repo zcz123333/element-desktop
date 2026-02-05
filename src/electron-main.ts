@@ -560,6 +560,7 @@ app.on("ready", async () => {
                 }) === 0;
             if (shouldCancelCloseRequest) {
                 e.preventDefault();
+                global.appQuitting = false;
                 return false;
             }
         }
