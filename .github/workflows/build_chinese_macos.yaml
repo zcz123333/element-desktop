@@ -36,27 +36,28 @@ jobs:
             - run: sudo pip3 install pyobjc-framework-Quartz
 
 
+            - uses: pnpm/action-setup@v4
             - uses: actions/setup-node@v6
               with:
                   node-version-file: .node-version
-                  cache: "yarn"
+                  cache: "pnpm"
 
             # Does not need branch matching as only analyses this layer
             - name: Install Deps
-              run: "yarn install --frozen-lockfile"
+              run: "pnpm install --frozen-lockfile"
 
             - name: Fetch Element Web
-              run: yarn run fetch --noverify -d "element.io/release/"
+              run: pnpm run fetch --noverify -d "element.io/release/"
 
             - name: Copy variant config
               run: cp "element.io/release/build.json" variant.json
 
             - name: Build Natives
               run: |
-                  yarn build:native:universal
+                  pnpm build:native:universal
             - name: "[Unsigned] Build App"
               run: |
-                  yarn build:universal --publish never -m dmg
+                  pnpm build:universal --publish never -m dmg
               env:
                   CSC_IDENTITY_AUTO_DISCOVERY: false
                   VARIANT_PATH: variant.json
