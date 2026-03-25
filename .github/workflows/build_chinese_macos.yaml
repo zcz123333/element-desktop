@@ -13,6 +13,8 @@ jobs:
                   xcode-version: latest-stable
 
             - uses: actions/checkout@v6
+              with:
+                  persist-credentials: false
 
             - name: prepare
               id: prepare
